@@ -49,12 +49,6 @@ spec:
               cpu: "100m"
             requests:
               cpu: "100m"
-                #livenessProbe:
-                #  exec:
-                #    command: ["mysqladmin", "ping"]
-                #  initialDelaySeconds: 30
-                #  periodSeconds: 10
-                #  timeoutSeconds: 5
         readinessProbe:
           exec:
             #command: ["mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD"]
@@ -62,28 +56,12 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 2
           timeoutSeconds: 1
-                #readinessProbe:
-                #  exec:
-                #    command:
-                #      - "mysqladmin"
-                #      - "ping"
-                #      - "-h"
-                #      - "localhost"
-                #      - "-u"
-                #      - "root"
-                #      - "-p$MYSQL_ROOT_PASSWORD"
-                #  initialDelaySeconds: 10
-                #  periodSeconds: 5
         ports:
         - containerPort: 3306
           name: mysql
         volumeMounts:        # Mounting voulume obtained from Persistent Volume Claim
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql #This is the path in the container on which the mounting will take place.
-      #volumes:
-      #- name: mysql-persistent-storage # Obtaining 'vloume' from PVC
-      #  persistentVolumeClaim:
-      #    claimName: mysql-pv-claim
   volumeClaimTemplates:
   - metadata:
       name: mysql-persistent-storage

@@ -3,16 +3,16 @@ app:
   flaskreplicaCount: 2
 
 general:
-  version: 0.7
+  version: 0.9
 
 # Images - note pull policy matters for minikube as it will
 # try to download from docker hub rather than your local machine
 flaskImage:
-  name: nhutton/flask_test_app:0.7
+  name: nhutton/flask_test_app:0.9
   imagePullPolicy: Always
 
 scraperImage:
-  name: nhutton/scraper_test_app:0.7
+  name: nhutton/scraper_test_app:0.9
   imagePullPolicy: Always
 
 #Database values.
