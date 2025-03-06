@@ -27,11 +27,11 @@ def inject_data(name):
         cur.execute("SHOW TABLES")
         tables = [table[0] for table in cur.fetchall()]
 
-        if "dataa" in tables:
-            cur.execute("INSERT INTO dataa(name, email) VALUES(%s, %s)",(name, email))
+        if "scraper" in tables:
+            cur.execute("INSERT INTO scraper(name, email) VALUES(%s, %s)",(name, email))
         else:
-            cur.execute("CREATE TABLE dataa (name varchar(20), email varchar(40));")
-            cur.execute("INSERT INTO dataa(name, email) VALUES(%s, %s)",(name, email))
+            cur.execute("CREATE TABLE scraper (name varchar(20), email varchar(40));")
+            cur.execute("INSERT INTO scraper(name, email) VALUES(%s, %s)",(name, email))
         con.commit()
         con.close()
 
@@ -50,34 +50,9 @@ if __name__ == '__main__':
     if args.dry_run:
         print(f"Dry run - do nothing.")
     else:
-        #app.run(host='0.0.0.0', debug=True, port=args.port)
-
-        # CoinMetrics API endpoint
-        url = "https://api.coinmetrics.io/v4/timeseries/asset-metrics"
-
-        # Query parameters
-        params = {
-            "assets": "btc",
-            "metrics": "HashRate",
-            "frequency": "1d",
-            "start_time": "2024-01-01",
-            "end_time": "2024-02-01",
-            "api_key": "YOUR_API_KEY"  # Replace with your CoinMetrics API key if required
-        }
-
-        # Make the request
-        #response = requests.get(url, params=params)
-
-        ## Check for successful response
-        #if response.status_code == 200:
-        #    data = response.json()
-        #    for entry in data["data"]:
-        #        print(f"Date: {entry['time']}, Hash Rate: {entry['HashRate']}")
-        #else:
-        #    print(f"Error: {response.status_code}, {response.text}")
-
         i = 0
 
+        # Loop over, just pushing some dummy values into the database
         while True:
             print('i')
 
