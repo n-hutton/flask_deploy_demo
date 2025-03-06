@@ -2,21 +2,36 @@ import os
 from flask import Flask, render_template, request, redirect, jsonify
 import mysql.connector as mysql
 import argparse
+from sqlalchemy import create_engine, Column, String, Integer, inspect, text
+from sqlalchemy.orm import sessionmaker, declarative_base
 
+# Define the base model
+Base = declarative_base()
+
+# Define the Scraper table as a SQLAlchemy model - cleaner
+class User(Base):
+    __tablename__ = "user_data"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    email = Column(String(120), unique=True, nullable=False)
+
+class DatabaseManager():
+    session = None
+
+    def connect(self):
+        # SQLAlchemy engine for cleaner execution
+        DATABASE_URL = f"mysql+mysqlconnector://{os.getenv('MYSQL_USER')}:{os.getenv('MYSQL_PASSWORD')}@{os.getenv('MYSQL_HOST')}/{os.getenv('MYSQL_DATABASE')}"
+        engine = create_engine(DATABASE_URL, echo=True)
+
+        # Create the table if it doesn't exist
+        Base.metadata.create_all(engine)
+
+        # Create a session factory
+        SessionLocal = sessionmaker(bind=engine)
+        self.session = SessionLocal
+
+manager = DatabaseManager()
 app = Flask(__name__)
-
-def establish_connection():
-    """
-    gain connection
-    """
-    cnx = mysql.connect(
-        host=os.getenv('MYSQL_HOST'),
-        user=os.getenv('MYSQL_USER'),
-        password=os.getenv('MYSQL_PASSWORD'),
-        database=os.getenv('MYSQL_DATABASE'),
-        auth_plugin='mysql_native_password'
-    )
-    return cnx
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -25,56 +40,46 @@ def index():
         userDetails = request.form
         name = userDetails['name']
         email = userDetails['email']
-        con=establish_connection()
-        cur = con.cursor()
-        cur.execute("SHOW TABLES")
-        if cur.fetchone():
-            cur.execute("INSERT INTO users(name, email) VALUES(%s, %s)",(name, email))
-        else:
-            cur.execute("CREATE TABLE users (name varchar(20), email varchar(40));")
-            cur.execute("INSERT INTO users(name, email) VALUES(%s, %s)",(name, email))
-        con.commit()
-        con.close()
+
+        session = manager.session()
+
+        # Check if the entry already exists
+        existing_entry = session.query(User).filter_by(name=name).first()
+        if not existing_entry:
+            session.add(User(name=name, email=email))
+            session.commit()
         return redirect('/users')
     return render_template('index.html')
 
 @app.route('/users')
 def users():
-    con=establish_connection()
-    cur = con.cursor()
-    cur.execute("SELECT * FROM users")
-    userDetails=cur.fetchall()
-    if len(userDetails) > 0:
-        return render_template('users.html',userDetails=userDetails)
+    session = manager.session()
+    userDetails = session.query(User).all()
 
-"""
-Show everything in the database, as JSON
-"""
+    return render_template('users.html', userDetails=userDetails)
+
 @app.route('/all')
-def allx():
-    con = establish_connection()
-    cur = con.cursor()
-
-    # Get all table names from MySQL
-    cur.execute("SHOW TABLES;")
-    tables = [table[0] for table in cur.fetchall()]
-
+def all():
+    """
+    Show everything in the database as JSON.
+    """
     db_dump = {}
 
-    for table_name in tables:
-        cur.execute(f"SELECT * FROM `{table_name}`")  # Use backticks for safety
-        rows = cur.fetchall()
+    session = manager.session()
+    try:
+        inspector = inspect(session.bind)  # Get metadata about the database
 
-        # Get column names
-        col_names = [desc[0] for desc in cur.description]
+        for table_name in inspector.get_table_names():
+            # Execute a query to fetch all records
+            table_data = session.execute(text(f"SELECT * FROM `{table_name}`")).mappings().all()
 
-        # Store table data as list of dicts
-        db_dump[table_name] = [dict(zip(col_names, row)) for row in rows]
+            # Convert rows to list of dictionaries
+            db_dump[table_name] = [dict(row) for row in table_data]
 
-    con.close()
+    finally:
+        session.close()  # Ensure session is closed
 
     return jsonify(db_dump)
-
 
 
 """
@@ -101,5 +106,6 @@ if __name__ == '__main__':
     if args.dry_run:
         print(f"Dry run - do nothing.")
     else:
+        manager.connect()
         app.run(host='0.0.0.0', debug=True, port=args.port)
 
