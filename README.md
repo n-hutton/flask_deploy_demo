@@ -43,7 +43,7 @@ docker buildx build --platform linux/amd64 . -t nhutton/flask_test_app:0.9 -f ./
 docker buildx build --platform linux/amd64 . -t nhutton/scraper_test_app:0.9 -f ./Dockerfile
 
 # deploy the helmchart
-helm install --set db.username=testuser,db.password=user@123,flaskImage.imagePullPolicy=Never,scraperImage.imagePullPolicy=Never flaskapptst helmcharts/
+helm install --set db.username=testuser,db.password=user123,flaskImage.imagePullPolicy=Never,scraperImage.imagePullPolicy=Never flaskapptst helmcharts/
 
 # check status
 minikube status

@@ -1,39 +1,50 @@
 import requests
 import time
 import os
-from flask import Flask, render_template, request, redirect
 import mysql.connector as mysql
 import argparse
 
-app = Flask(__name__)
+from sqlalchemy import create_engine, Column, String, Integer
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-def establish_connection():
-    """
-    gain connection
-    """
-    cnx = mysql.connect(
-        host=os.getenv('MYSQL_HOST'),
-        user=os.getenv('MYSQL_USER'),
-        password=os.getenv('MYSQL_PASSWORD'),
-        database=os.getenv('MYSQL_DATABASE'),
-        auth_plugin='mysql_native_password'
-    )
-    return cnx
+# Define the base model
+Base = declarative_base()
 
-def inject_data(name):
-        email = "thisem@nono.com"
-        con=establish_connection()
-        cur = con.cursor()
-        cur.execute("SHOW TABLES")
-        tables = [table[0] for table in cur.fetchall()]
+# Define the Scraper table as a SQLAlchemy model - cleaner
+class Scraper(Base):
+    __tablename__ = "scraper_data"
 
-        if "scraper" in tables:
-            cur.execute("INSERT INTO scraper(name, email) VALUES(%s, %s)",(name, email))
-        else:
-            cur.execute("CREATE TABLE scraper (name varchar(20), email varchar(40));")
-            cur.execute("INSERT INTO scraper(name, email) VALUES(%s, %s)",(name, email))
-        con.commit()
-        con.close()
+    name = Column(String(20), primary_key=True)
+    value = Column(Integer, nullable=False)
+
+class DatabaseManager():
+    session = None
+
+    def connect(self):
+        # SQLAlchemy engine for cleaner execution
+        DATABASE_URL = f"mysql+mysqlconnector://{os.getenv('MYSQL_USER')}:{os.getenv('MYSQL_PASSWORD')}@{os.getenv('MYSQL_HOST')}/{os.getenv('MYSQL_DATABASE')}"
+        engine = create_engine(DATABASE_URL, echo=True)
+
+        # Create the table if it doesn't exist
+        Base.metadata.create_all(engine)
+
+        # Create a session factory
+        SessionLocal = sessionmaker(bind=engine)
+        self.session = SessionLocal
+
+manager = DatabaseManager()
+
+def inject_data(value):
+    name = f"Test data {value}"
+    session = manager.session()
+
+    # Check if the entry already exists
+    existing_entry = session.query(Scraper).filter_by(name=name).first()
+    if not existing_entry:
+        session.add(Scraper(name=name, value=value))
+        session.commit()
+
+    session.close()
 
 
 if __name__ == '__main__':
@@ -50,11 +61,12 @@ if __name__ == '__main__':
     if args.dry_run:
         print(f"Dry run - do nothing.")
     else:
-        i = 0
+        manager.connect()
+        i = 100
 
         # Loop over, just pushing some dummy values into the database
         while True:
-            print('i')
+            print(f'iteration {i}')
 
             inject_data(i)
             i += 1

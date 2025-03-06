@@ -47,18 +47,10 @@ def users():
     if len(userDetails) > 0:
         return render_template('users.html',userDetails=userDetails)
 
+"""
+Show everything in the database, as JSON
+"""
 @app.route('/all')
-def all():
-    con=establish_connection()
-    cur = con.cursor()
-    #cur.execute("SELECT * FROM users")
-    cur.execute("SELECT name FROM * WHERE type='table';")
-    tables = cur.fetchall()
-    tables=cur.fetchall()
-    #if len(userDetails) > 0:
-    return render_template('users.html',tables=tables)
-
-@app.route('/allx')
 def allx():
     con = establish_connection()
     cur = con.cursor()
@@ -82,9 +74,12 @@ def allx():
     con.close()
 
     return jsonify(db_dump)
-    #return render_template(db_dump)
 
 
+
+"""
+Display which pod we are in/version
+"""
 @app.route('/version')
 def version():
     try:
@@ -93,19 +88,6 @@ def version():
         return(f"Container ID: {container_id}")
     except Exception as e:
         return(f"Unexpected error when detecting container ID: {e}")
-
-#@jsonrpc.method('app.index')
-#def index(a):
-#    return 'hello {a}'.format(a=a)
-
-@app.route('/wheewhoo')
-def whee():
-    con=establish_connection()
-    cur = con.cursor()
-    cur.execute("SELECT * FROM users")
-    userDetails=cur.fetchall()
-    if len(userDetails) > 0:
-        return render_template('users.html',userDetails=userDetails)
 
 if __name__ == '__main__':
 
