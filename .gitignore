@@ -1,0 +1,73 @@
+# Python-related files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+*.log
+
+# Virtual environment
+venv/
+env/
+myenv/
+
+# Pip dependency files
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Environment variables & config files
+.env
+.env.local
+instance/
+config.json
+secrets.yaml
+
+# Flask cache & logs
+*.db
+*.sqlite
+*.sqlite3
+instance/
+logs/
+*.log
+
+# Kubernetes & Helm-related files
+helm-chart/charts/
+helm-chart/templates/*.tgz
+helm-chart/templates/.helmignore
+helm-chart/templates/__pycache__/
+helm-chart/templates/*.pyc
+helm-chart/templates/*.lock
+
+# Helm deployment files
+*.tgz
+values.yaml
+values-prod.yaml
+secrets.yaml
+*.lock
+
+# Docker-related files
+docker-compose.override.yml
+docker-compose.yml
+.dockerignore
+.DS_Store
+
+# Build-related files
+dist/
+build/
+*.tar.gz
+*.whl
+
+# VS Code, JetBrains, and other IDE files
+.vscode/
+.idea/
+*.iml
+
+# Git & security
+.git/
+.gitignore
+*.pem
+*.crt
+*.key
+*.pub
+*.swp
