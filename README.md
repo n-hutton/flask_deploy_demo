@@ -16,6 +16,8 @@ Local development can be tested with minikube, and it can be deployed using helm
 
 ## Custer Architecture
 ![Cluster Architecture image](https://github.com/n-hutton/flask_deploy_demo/blob/main/.images/blockpng.drawio.png)
+
+## Microservices Architecture
 ![Kubernetes pods image](https://github.com/n-hutton/flask_deploy_demo/blob/main/.images/pods.drawio.png)
 
 ##  Summary
