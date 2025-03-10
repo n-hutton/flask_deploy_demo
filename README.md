@@ -15,9 +15,8 @@ Local development can be tested with minikube, and it can be deployed using helm
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) CLI installed.
 
 ## Custer Architecture
-![Cluster Architecture image](https://github.com/)
-
-![Kubernetes pods image](https://github.com/)
+![Cluster Architecture image](https://github.com/nhutton/Flaskdemo/blob/master/.images/blockpng.drawio.png)
+![Kubernetes pods image](https://github.com/nhutton/Flaskdemo/blob/master/.images/pods.drawio.png)
 
 ##  Summary
 The Flask app image, built using the Dockerfile, is pushed to a public Docker Hub repository (flaskapp). In the Kubernetes cluster, a Flask app service is created to route traffic to frontend pods, which are managed by a ReplicaSet. The MySQL service is deployed using a StatefulSet, with the MySQL pod utilizing a Persistent Volume Claim (PVC) to request storage from a Persistent Volume (PV). The cluster also sets up ConfigMaps and Secrets to manage environment variables securely. The entire deployment is orchestrated using a Helm chart.
