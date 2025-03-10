@@ -1,0 +1,33 @@
+#Flask app values.
+app:
+  flaskreplicaCount: 2
+
+general:
+  version: 0.9
+
+# Images - note pull policy matters for minikube as it will
+# try to download from docker hub rather than your local machine
+flaskImage:
+  name: nhutton/flask_test_app:0.9
+  imagePullPolicy: Always
+
+scraperImage:
+  name: nhutton/scraper_test_app:0.9
+  imagePullPolicy: Always
+
+#Database values.
+db:
+  mysqlreplicaCount: 1
+  username: #dGVzdHVzZXI=
+  password: #dGVzdHVzZXJAMTIz
+  host: mysql
+  db_name: TEST
+  #db-root-credentials
+  rootpassword: YWRtaW4xMjM=
+
+persistence:
+  enabled: true
+  storageClass: "standard"
+  accessModes:
+    - ReadWriteOnce
+  size: "1Gi"
